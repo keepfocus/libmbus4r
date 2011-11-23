@@ -1,0 +1,7 @@
+*.gem
+.bundle
+Gemfile.lock
+pkg/*
+ext/libmbus4r/libmbus4r.bundle
+ext/libmbus4r/libmbus4r.o
+ext/libmbus4r/Makefile
