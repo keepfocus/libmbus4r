@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "libmbus4r"
 
-  s.extensions << 'ext/libmbus4r/extconf.rb'
+  s.extensions << 'ext/libmbus/extconf.rb'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -22,5 +22,6 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   s.add_development_dependency "rspec"
+  s.add_development_dependency "rake-compiler"
   # s.add_runtime_dependency "rest-client"
 end

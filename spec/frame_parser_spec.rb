@@ -1,4 +1,4 @@
-require 'libmbus4r'
+require 'spec_helper'
 
 require "rexml/document"
 
