@@ -19,7 +19,7 @@ module LibMbus
         @frame = Frame.parse(str)
       end
 
-      it "Parses mbus frame to xml" do
+      it "parses mbus frame to xml" do
         xml = @frame.to_xml
         doc = REXML::Document.new(xml)
         doc.elements["MBusData/SlaveInformation/Id"].text.should == "828331"
@@ -45,6 +45,13 @@ module LibMbus
         data[1][:function].should == "Instantaneous value"
         data[1][:unit].should == "m^3"
         data[1][:value].should == 3740.92
+      end
+    end
+
+    describe "with invalid mbus frame" do
+      it "returns no frame" do
+        frame = Frame.parse("dummy1")
+        frame.should be_nil
       end
     end
   end

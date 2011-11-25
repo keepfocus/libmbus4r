@@ -27,16 +27,25 @@ static void mbus4r_frame_free(mbus_frame_and_data *p)
 static VALUE mbus4r_frame_parse(VALUE class, VALUE buffer)
 {
   mbus_frame *frame = mbus_frame_new(MBUS_FRAME_TYPE_ANY);
-  mbus_frame_data *data = mbus_frame_data_new();
-  mbus_frame_and_data *fd = malloc(sizeof(mbus_frame_and_data));
 
-  mbus_parse(frame, RSTRING_PTR(buffer), RSTRING_LEN(buffer));
-  mbus_frame_data_parse(frame, data);
-  fd->frame = frame;
-  fd->data = data;
+  if (frame) {
+    if (mbus_parse(frame, RSTRING_PTR(buffer), RSTRING_LEN(buffer)) == 0) {
+      mbus_frame_data *data = mbus_frame_data_new();
+      mbus_frame_and_data *fd = malloc(sizeof(mbus_frame_and_data));
 
-  VALUE tdata = Data_Wrap_Struct(class, 0, mbus4r_frame_free, fd);
-  return tdata;
+      mbus_frame_data_parse(frame, data);
+      fd->frame = frame;
+      fd->data = data;
+
+      VALUE tdata = Data_Wrap_Struct(class, 0, mbus4r_frame_free, fd);
+      return tdata;
+    }
+    else {
+      mbus_frame_free(frame);
+    }
+  }
+
+  return Qnil;
 }
 
 static VALUE mbus4r_frame_to_xml(VALUE self)
