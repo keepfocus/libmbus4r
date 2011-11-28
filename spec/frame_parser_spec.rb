@@ -32,19 +32,30 @@ module LibMbus
         @frame.serial.should == "8283312D2C0104"
       end
 
-      it "runs block over each data field" do
-        data = @frame.map_data_fields do |h|
-          h
+      describe "mapping data fields" do
+        before :each do
+          @data = @frame.map_data_fields do |h|
+            h
+          end
         end
-        data.should have(12).elements
-        data[0][:quantity].should == "Energy"
-        data[0][:function].should == "Instantaneous value"
-        data[0][:unit].should == "J"
-        data[0][:value].should == 355780000000
-        data[1][:quantity].should == "Volume"
-        data[1][:function].should == "Instantaneous value"
-        data[1][:unit].should == "m^3"
-        data[1][:value].should == 3740.92
+
+        it "finds 12 data fields" do
+          @data.should have(12).elements
+        end
+
+        it "finds first data field" do
+          @data[0][:quantity].should == "Energy"
+          @data[0][:function].should == "Instantaneous value"
+          @data[0][:unit].should == "J"
+          @data[0][:value].should == 355780000000
+        end
+
+        it "finds second data field" do
+          @data[1][:quantity].should == "Volume"
+          @data[1][:function].should == "Instantaneous value"
+          @data[1][:unit].should == "m^3"
+          @data[1][:value].should == 3740.92
+        end
       end
     end
 
