@@ -115,7 +115,7 @@ static VALUE mbus4r_frame_data_fields(VALUE self)
   return result;
 }
 
-void Init_libmbus()
+void Init_mbus()
 {
   rb_mLibMbus = rb_define_module("LibMbus");
 

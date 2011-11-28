@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "libmbus4r"
 
-  s.extensions << 'ext/libmbus/extconf.rb'
+  s.extensions << 'ext/mbus/extconf.rb'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

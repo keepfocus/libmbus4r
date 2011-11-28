@@ -7,7 +7,7 @@ def gemspec
   @clean_gemspec ||= eval(File.read(File.expand_path('../libmbus4r.gemspec', __FILE__)))
 end
 
-Rake::ExtensionTask.new("libmbus", gemspec) do |ext|
+Rake::ExtensionTask.new("mbus", gemspec) do |ext|
 end
 
 RSpec::Core::RakeTask.new('spec')

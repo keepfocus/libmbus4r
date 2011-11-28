@@ -2,5 +2,5 @@
 .bundle
 Gemfile.lock
 pkg/*
-lib/libmbus.bundle
+lib/mbus.bundle
 tmp
