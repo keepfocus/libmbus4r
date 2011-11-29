@@ -3,4 +3,5 @@
 Gemfile.lock
 pkg/*
 lib/mbus.bundle
+lib/mbus.so
 tmp
