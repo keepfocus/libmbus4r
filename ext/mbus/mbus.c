@@ -28,8 +28,12 @@ static VALUE mbus4r_frame_parse(VALUE class, VALUE buffer)
 {
   mbus_frame *frame = mbus_frame_new(MBUS_FRAME_TYPE_ANY);
 
+  unsigned char length = RSTRING_PTR(buffer)[1] + 6;
+  if (RSTRING_LEN(buffer) < length)
+    length = RSTRING_LEN(buffer);
+
   if (frame) {
-    if (mbus_parse(frame, RSTRING_PTR(buffer), RSTRING_LEN(buffer)) <= 0) {
+    if (mbus_parse(frame, RSTRING_PTR(buffer), length) <= 0) {
       if (frame->type != MBUS_FRAME_TYPE_ANY) {
         mbus_frame_data *data = mbus_frame_data_new();
         mbus_frame_and_data *fd = malloc(sizeof(mbus_frame_and_data));

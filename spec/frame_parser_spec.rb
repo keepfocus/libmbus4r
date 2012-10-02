@@ -29,7 +29,7 @@ module LibMbus
       end
 
       it "has a secondary id" do
-        @frame.serial.should == "8283312D2C0104"
+        @frame.serial.should == "008283312D2C0104"
       end
 
       describe "mapping data fields" do
@@ -88,7 +88,7 @@ module LibMbus
       end
 
       it "has a secondary id" do
-        @frame.serial.should == "46847042040602"
+        @frame.serial.should == "0046847042040602"
       end
 
       describe "mapping data fields" do
