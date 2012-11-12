@@ -1,6 +1,6 @@
 require 'mkmf'
 
-if have_library("mbus","mbus_parse")
+if have_library("mbus","main")
 then
   create_makefile("mbus")
 else
