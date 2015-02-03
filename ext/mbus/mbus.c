@@ -27,6 +27,7 @@ static void mbus4r_frame_free(mbus_frame_and_data *p)
 static VALUE mbus4r_frame_parse(VALUE class, VALUE buffer)
 {
   mbus_frame *frame = mbus_frame_new(MBUS_FRAME_TYPE_ANY);
+  VALUE tdata;
 
   unsigned char length = RSTRING_PTR(buffer)[1] + 6;
   if (RSTRING_LEN(buffer) < length)
@@ -42,7 +43,7 @@ static VALUE mbus4r_frame_parse(VALUE class, VALUE buffer)
         fd->frame = frame;
         fd->data = data;
 
-        VALUE tdata = Data_Wrap_Struct(class, 0, mbus4r_frame_free, fd);
+        tdata = Data_Wrap_Struct(class, 0, mbus4r_frame_free, fd);
         return tdata;
       }
     }
@@ -79,10 +80,12 @@ static VALUE mbus4r_frame_data_fields(VALUE self)
   VALUE result = rb_ary_new();
   VALUE hash;
   mbus_record *mr;
+  mbus_data_variable_header *header;
   int i = 0;
 
   Data_Get_Struct(self, mbus_frame_and_data, fd);
   if (fd->data->type == MBUS_DATA_TYPE_VARIABLE) {
+    header = &(fd->data->data_var.header);
     record = fd->data->data_var.record;
     for (i = 0; record; record = record->next, i++) {
       hash = rb_hash_new();
@@ -106,7 +109,7 @@ static VALUE mbus4r_frame_data_fields(VALUE self)
         mbus_record_free(mr);
       }
       else {
-        rb_hash_aset(hash, CSTR2SYM("raw"), rb_str_new(record->data, record->data_len));
+        rb_hash_aset(hash, CSTR2SYM("raw"), rb_str_new((char *)record->data, record->data_len));
         rb_hash_aset(hash, CSTR2SYM("dib"), INT2FIX(record->drh.dib.dif));
         rb_hash_aset(hash, CSTR2SYM("vib"), INT2FIX(record->drh.vib.vif));
         rb_hash_aset(hash, CSTR2SYM("function"), rb_str_new2(mbus_data_record_function(record)));
@@ -114,6 +117,19 @@ static VALUE mbus4r_frame_data_fields(VALUE self)
         rb_hash_aset(hash, CSTR2SYM("error"), rb_str_new2("Could not parse data record"));
       }
       rb_ary_push(result, rb_yield(hash));
+      // OK, I admit this is a bit of a dirty type-checking to find pulse meters in frame.
+      if ((record->drh.dib.dif == MBUS_DIB_DIF_MANUFACTURER_SPECIFIC) || (record->drh.dib.dif == MBUS_DIB_DIF_MORE_RECORDS_FOLLOW)) {
+        if ((header->manufacturer[0] == 0x2d) && (header->manufacturer[1] == 0x2c) && ((fd->frame->length1 == 0x82) || (fd->frame->length1 == 0x92))) {
+          hash = rb_hash_new();
+          rb_hash_aset(hash, CSTR2SYM("value"), rb_int_new((int)mbus_data_bcd_decode(record->data+30, 4)));
+          rb_hash_aset(hash, CSTR2SYM("unit"), rb_str_new2("Units for H.C.A."));
+          rb_ary_push(result, rb_yield(hash));
+          hash = rb_hash_new();
+          rb_hash_aset(hash, CSTR2SYM("value"), rb_int_new((int)mbus_data_bcd_decode(record->data+34, 4)));
+          rb_hash_aset(hash, CSTR2SYM("unit"), rb_str_new2("Units for H.C.A."));
+          rb_ary_push(result, rb_yield(hash));
+        }
+      }
     }
   }
   return result;

@@ -4,7 +4,7 @@ require "rexml/document"
 
 module LibMbus
   describe Frame do
-    describe "package from abb meter" do
+    describe "package from kamstrup meter" do
       before :each do
         str =  "\x68\x82\x82\x68\x08\x1f\x72\x31\x83\x82\x00\x2d\x2c\x01\x04"
         str << "\x02\x00\x00\x00\x0c\x0f\x78\x55\x03\x00\x0c\x14\x92\x40\x37"
@@ -39,8 +39,8 @@ module LibMbus
           end
         end
 
-        it "finds 12 data fields" do
-          @data.should have(12).elements
+        it "finds 14 data fields" do
+          @data.should have(14).elements
         end
 
         it "finds first data field" do
@@ -98,7 +98,7 @@ module LibMbus
           end
         end
 
-        it "finds 12 data fields" do
+        it "finds 7 data fields" do
           @data.should have(7).elements
         end
 
@@ -107,6 +107,41 @@ module LibMbus
           @data[0][:function].should == "Instantaneous value"
           @data[0][:unit].should == "Wh"
           @data[0][:value].should == 41173100
+        end
+      end
+    end
+
+    describe "frame from kamstrup meter with pulse in manufacturer specific" do
+      before :each do
+        str  = "\x68\x82\x82\x68\x08\x25\x72\x37\x50\x63\x04\x2d\x2c\x15\x04\xeb"
+        str << "\x20\x00\x00\x0c\x06\x89\x88\x05\x00\x0c\x14\x84\x07\x72\x00\x0c"
+        str << "\x22\x28\x24\x09\x00\x0c\x59\x89\x69\x00\x00\x0c\x5d\x47\x25\x00"
+        str << "\x00\x0c\x61\x42\x44\x00\x00\x0c\x2d\x00\x00\x00\x00\x0c\x3b\x00"
+        str << "\x00\x00\x00\x4c\x06\x53\x56\x05\x00\x4c\x14\x93\x97\x70\x00\x42"
+        str << "\x6c\xdf\x15\x0f\x37\x50\x63\x04\x00\x00\x36\x00\x00\x00\x00\x00"
+        str << "\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        str << "\x00\x00\x04\x52\x47\x00\x95\x45\x30\x00\x36\x41\x04\x00\x24\x24"
+        str << "\x80\x01\x02\x02\x15\x00\x45\x16"
+        @frame = Frame.parse(str)
+      end
+
+      describe "mapping data fields" do
+        before :each do
+          @data = @frame.map_data_fields do |h|
+            h
+          end
+        end
+
+        it "finds 14 data fields" do
+          @data.should have(14).elements
+        end
+
+        it "finds pulse fields after other fields" do
+          @data[12][:unit].should == "Units for H.C.A."
+          @data[12][:value].should == 475204
+
+          @data[13][:unit].should == "Units for H.C.A."
+          @data[13][:value].should == 304595
         end
       end
     end
